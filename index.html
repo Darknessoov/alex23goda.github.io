@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход в систему</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6200ee;
+            --primary-dark: #3700b3;
+            --background: #121212;
+            --surface: #1e1e1e;
+            --text: #e1e1e1;
+            --gray: #646464;
+            --success: #03dac6;
+            --error: #cf6679;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); } /* Изменено - убрана трансформация при завершении */
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--background);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+            overflow: hidden;
+        }
+        
+        .container {
+            background: var(--surface);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 400px;
+            overflow: hidden;
+            transform: scale(0.95);
+            opacity: 0;
+            animation: fadeIn 0.6s ease-out forwards;
+            animation-delay: 0.2s;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 25px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        
+        .header:hover::after {
+            opacity: 1;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+            transform: translateY(20px);
+            opacity: 0;
+            animation: fadeIn 0.6s ease-out forwards;
+            animation-delay: 0.4s;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.8;
+            transform: translateY(20px);
+            opacity: 0;
+            animation: fadeIn 0.6s ease-out forwards;
+            animation-delay: 0.5s;
+        }
+        
+        .form {
+            padding: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+        
+        .form-group:nth-child(1) {
+            animation-delay: 0.6s;
+        }
+        
+        .form-group:nth-child(2) {
+            animation-delay: 0.7s;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid var(--gray);
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+            background: var(--surface);
+            color: var(--text);
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(98, 0, 238, 0.2);
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: var(--gray);
+            transition: all 0.3s;
+        }
+        
+        .password-toggle:hover {
+            color: var(--text);
+        }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            background-color: var(--primary);
+            color: white;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            animation: fadeIn 0.6s ease-out forwards;
+            animation-delay: 0.8s;
+            transform: translateY(0); /* Изменено с translateY(20px) */
+        }
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(0) scale(1.02); /* Добавлено translateY(0) для сохранения позиции */
+            animation: none; /* Убрана анимация pulse */
+        }
+
+        .btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+        
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%, -50%);
+            transform-origin: 50% 50%;
+        }
+        
+        .btn:focus:not(:active)::after {
+            animation: ripple 1s ease-out;
+        }
+        
+        .error-message {
+            color: var(--error);
+            font-size: 13px;
+            margin-top: 5px;
+            display: none;
+            animation: shake 0.5s;
+        }
+        
+        .success-message {
+            color: var(--success);
+            font-size: 14px;
+            text-align: center;
+            margin-top: 15px;
+            display: none;
+        }
+        
+        .floating-icons {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .floating-icon {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.05);
+            font-size: 24px;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                margin: 20px;
+                width: calc(100% - 40px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-icons">
+        <i class="fas fa-user floating-icon" style="top: 10%; left: 15%; animation-delay: 0s;"></i>
+        <i class="fas fa-lock floating-icon" style="top: 25%; left: 80%; animation-delay: 1s;"></i>
+        <i class="fas fa-key floating-icon" style="top: 65%; left: 10%; animation-delay: 2s;"></i>
+        <i class="fas fa-shield-alt floating-icon" style="top: 80%; left: 75%; animation-delay: 3s;"></i>
+    </div>
+    
+    <div class="container">
+        <div class="header">
+            <h1>Добро пожаловать</h1>
+            <p>Войдите в свой аккаунт</p>
+        </div>
+        <form class="form" id="loginForm">
+            <div class="form-group">
+                <input type="text" id="username" class="form-control" placeholder="Логин" required>
+            </div>
+            <div class="form-group" style="position: relative;">
+                <input type="password" id="password" class="form-control" placeholder="Пароль" required>
+                <i class="fas fa-eye password-toggle" id="togglePassword"></i>
+                <div class="error-message" id="passwordError">Неверный пароль</div>
+            </div>
+            <button type="submit" class="btn">
+                <span id="btnText">Войти</span>
+                <div id="btnLoader" style="display: none;">
+                    <i class="fas fa-spinner fa-spin"></i>
+                </div>
+            </button>
+            <div class="success-message" id="successMessage">Вход выполнен успешно!</div>
+        </form>
+    </div>
+
+    <script src="users.js"></script>
+    <script>
+        // Анимация появления элементов
+        document.addEventListener('DOMContentLoaded', function() {
+            // Показываем кнопку глаза после загрузки
+            setTimeout(() => {
+                document.getElementById('togglePassword').style.opacity = '1';
+                document.getElementById('togglePassword').style.transform = 'translateY(-50%)';
+            }, 1000);
+        });
+
+        // Переключение видимости пароля
+        const togglePassword = document.getElementById('togglePassword');
+        const password = document.getElementById('password');
+        
+        togglePassword.addEventListener('click', function() {
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+            this.classList.toggle('fa-eye-slash');
+            
+            // Анимация при клике
+            this.style.transform = 'translateY(-50%) scale(1.2)';
+            setTimeout(() => {
+                this.style.transform = 'translateY(-50%) scale(1)';
+            }, 200);
+        });
+
+        // Обработка формы входа
+        const loginForm = document.getElementById('loginForm');
+        const passwordError = document.getElementById('passwordError');
+        const successMessage = document.getElementById('successMessage');
+        const btnText = document.getElementById('btnText');
+        const btnLoader = document.getElementById('btnLoader');
+        
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            // Скрыть предыдущие ошибки
+            passwordError.style.display = 'none';
+            
+            // Показать загрузку
+            btnText.style.display = 'none';
+            btnLoader.style.display = 'block';
+            
+            // Имитация задержки сервера
+            setTimeout(function() {
+                if (users[username] && users[username].password === password) {
+                    // Успешный вход
+                    successMessage.style.display = 'block';
+                    loginForm.classList.add('success');
+                    
+                    // Анимация успешного входа
+                    document.querySelector('.container').style.transform = 'translateY(0) scale(0.95)';
+                    document.querySelector('.container').style.animation = 'none';
+                    setTimeout(() => {
+                        document.querySelector('.container').style.transform = 'translateY(-20px) scale(1.03)';
+                        document.querySelector('.container').style.transition = 'all 0.5s ease';
+                    }, 10);
+                    
+                    setTimeout(() => {
+                        document.querySelector('.container').style.transform = 'translateY(0) scale(1)';
+                        document.querySelector('.container').style.opacity = '0';
+                    }, 100);
+                    
+                    // Перенаправление после анимации
+                    setTimeout(function() {
+                        localStorage.setItem('currentUser', JSON.stringify({
+                            username: username,
+                            isAdmin: users[username].isAdmin
+                        }));
+                        window.location.href = 'home.html';
+                    }, 500);
+                } else {
+                    // Неверные данные
+                    passwordError.style.display = 'block';
+                    loginForm.classList.add('shake');
+                    setTimeout(() => loginForm.classList.remove('shake'), 500);
+                    
+                    // Сброс кнопки
+                    btnText.style.display = 'inline';
+                    btnLoader.style.display = 'none';
+                    
+                    // Анимация ошибки
+                    document.querySelector('.container').style.animation = 'shake 0.5s';
+                }
+            }, 1500);
+        });
+
+        // Анимация при фокусе на полях ввода
+        document.querySelectorAll('.form-control').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentNode.style.transform = 'translateY(0) scale(1.02)';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentNode.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>
